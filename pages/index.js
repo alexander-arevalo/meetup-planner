@@ -15,7 +15,7 @@ const Home = (props) => {
           content="Brows a huge list of highly active React meetups"
         />
       </Head>
-      <MeetupList meetups={props.meetups} />;
+      <MeetupList meetups={props.meetups} />
     </Fragment>
   );
 };
