@@ -1,14 +1,64 @@
+import { MongoClient, ObjectId } from "mongodb";
+
 import MeetupDetail from "@/components/meetups/MeetupDetail";
 
-const MeetupDetails = () => {
+const MeetupDetails = (props) => {
   return (
     <MeetupDetail
-      image="https://imgs.search.brave.com/1Any_NYLTNsW1U_AHvrk3xM2eifmK3ky45oC7BC9W50/rs:fit:500:0:0/g:ce/aHR0cHM6Ly9jZG4u/cGl4YWJheS5jb20v/cGhvdG8vMjAxNi8w/My8wNC8xOS8zNi9i/ZWFjaC0xMjM2NTgx/XzY0MC5qcGc"
-      title="First Title"
-      address="Address"
-      description="Describing"
+      image={props.meetupData.image}
+      title={props.meetupData.title}
+      address={props.meetupData.address}
+      description={props.meetupData.description}
     />
   );
 };
+
+export async function getStaticPaths() {
+  const client = await MongoClient.connect(
+    "mongodb+srv://zerotwo:PmTU1pPvesmAmNe3@cluster0.iu8tlpb.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetup_detail");
+  const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+  client.close();
+
+  return {
+    fallback: false,
+    paths: meetups.map((meetup) => ({
+      params: { meetupId: meetup._id.toString() },
+    })),
+  };
+}
+
+export async function getStaticProps(context) {
+  //fetching logic
+
+  const meetupId = context.params.meetupId;
+
+  const client = await MongoClient.connect(
+    "mongodb+srv://zerotwo:PmTU1pPvesmAmNe3@cluster0.iu8tlpb.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetup_detail");
+  const selectedMeetup = await meetupsCollection.findOne({
+    _id: new ObjectId(meetupId),
+  });
+  client.close();
+  console.log(meetupId);
+
+  return {
+    props: {
+      meetupData: {
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        address: selectedMeetup.address,
+        image: selectedMeetup.image,
+        description: selectedMeetup.description,
+      },
+    },
+  };
+}
 
 export default MeetupDetails;
