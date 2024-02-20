@@ -1,7 +1,11 @@
-import React from "react";
+import React, { Fragment } from "react";
 
-const index = () => {
-  return <div>index</div>;
+const MeetupDetails = () => {
+  return (
+    <Fragment>
+      <img src="" alt="" />
+    </Fragment>
+  );
 };
 
-export default index;
+export default MeetupDetails;
